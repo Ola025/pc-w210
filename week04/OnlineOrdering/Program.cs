@@ -132,4 +132,8 @@ Address address2 = new Address("456 Maple Ave", "Toronto", "ON", "Canada");
     Console.WriteLine($"Total Price: ${order2.GetTotalPrice()}\n");
 }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1b00875570d8d582fad28326fa4871a1d758f00a

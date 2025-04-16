@@ -220,4 +220,8 @@ private void RecordEvent()
 
 }
 
+<<<<<<< HEAD
 // Extra Feature: Level up notification every 100 points. You can also categorize goals for more creativity.
+=======
+// Extra Feature: Level up notification every 100 points. You can also categorize goals for more creativity.
+>>>>>>> 1b00875570d8d582fad28326fa4871a1d758f00a
