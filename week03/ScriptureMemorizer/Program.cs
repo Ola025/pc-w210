@@ -1,98 +1,97 @@
-using System; using System.Collections.Generic; using System.Linq;
+using System; using System.Collections.Generic;
 
-namespace ScriptureMemorizer { class Word { private string _text; private bool _isHidden;
+class Word { private string _text; private bool _isHidden;
 
 public Word(string text)
-    {
-        _text = text;
-        _isHidden = false;
-    }
+{
+    _text = text;
+    _isHidden = false;
+}
 
-    public bool IsHidden => _isHidden;
+public bool IsHidden => _isHidden;
 
-    public void Hide()
-    {
-        _isHidden = true;
-    }
+public void Hide()
+{
+    _isHidden = true;
+}
 
-    public string GetDisplayText()
+public string GetDisplayText()
+{
+    return IsHidden ? new string('_', _text.Length) : _text;
+}
+
+}
+
+class Scripture { private Reference _reference; private List<Word> _words;
+
+public Scripture(Reference reference, string text)
+{
+    _reference = reference;
+    _words = new List<Word>();
+    foreach (string word in text.Split(' '))
     {
-        return IsHidden ? new string('_', _text.Length) : _text;
+        _words.Add(new Word(word));
     }
 }
 
-class Scripture
+public void HideRandomWords(int numberToHide)
 {
-    private string _reference;
-    private List<Word> _words;
+    Random rand = new Random();
+    int hiddenCount = 0;
 
-    public Scripture(string reference, string text)
+    while (hiddenCount < numberToHide)
     {
-        _reference = reference;
-        _words = text.Split(' ').Select(word => new Word(word)).ToList();
-    }
-
-    public void HideRandomWords(int numberToHide)
-    {
-        Random random = new Random();
-        List<Word> visibleWords = _words.Where(w => !w.IsHidden).ToList();
-
-        for (int i = 0; i < numberToHide && visibleWords.Any(); i++)
+        int index = rand.Next(_words.Count);
+        if (!_words[index].IsHidden)
         {
-            int index = random.Next(visibleWords.Count);
-            visibleWords[index].Hide();
-            visibleWords.RemoveAt(index);
+            _words[index].Hide();
+            hiddenCount++;
         }
     }
-
-    public string GetDisplayText()
-    {
-        string text = string.Join(" ", _words.Select(word => word.GetDisplayText()));
-        return $"{_reference}\n{text}";
-    }
-
-    public bool AllWordsHidden()
-    {
-        return _words.All(word => word.IsHidden);
-    }
 }
 
-class Program
+public string GetDisplayText()
 {
-    static void Main(string[] args)
+    List<string> displayWords = new List<string>();
+    foreach (Word word in _words)
+    {
+        displayWords.Add(word.GetDisplayText());
+    }
+    return _reference.GetDisplayText() + " " + string.Join(" ", displayWords);
+}
+
+}
+
+class Reference { private string _book; private int _chapter; private int _verse;
+
+public Reference(string book, int chapter, int verse)
+{
+    _book = book;
+    _chapter = chapter;
+    _verse = verse;
+}
+
+public string GetDisplayText()
+{
+    return $"{_book} {_chapter}:{_verse}";
+}
+
+}
+
+class Program { static void Main(string[] args) { // Creativity: Added random hiding and clean console refresh for a better experience Reference reference = new Reference("Proverbs", 3, 5); Scripture scripture = new Scripture(reference, "Trust in the Lord with all your heart and lean not on your own understanding");
+
+while (true)
     {
         Console.Clear();
-        Console.WriteLine("Welcome to Scripture Memorizer!");
+        Console.WriteLine(scripture.GetDisplayText());
+        Console.WriteLine("\nPress Enter to hide more words or type 'quit' to exit.");
 
-        // Reference and text of the scripture
-        string reference = "Proverbs 3:5-6";
-        string text = "Trust in the Lord with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.";
-
-        Scripture scripture = new Scripture(reference, text);
-
-        while (true)
+        string input = Console.ReadLine();
+        if (input.ToLower() == "quit")
         {
-            Console.Clear();
-            Console.WriteLine(scripture.GetDisplayText());
-            Console.WriteLine("\nPress Enter to hide words or type 'quit' to end.");
-            string input = Console.ReadLine();
-
-            if (input.ToLower() == "quit")
-            {
-                break;
-            }
-
-            if (!scripture.AllWordsHidden())
-            {
-                scripture.HideRandomWords(3);
-            }
-            else
-            {
-                Console.WriteLine("All words are hidden. Press Enter to quit.");
-                Console.ReadLine();
-                break;
-            }
+            break;
         }
+        scripture.HideRandomWords(2);
     }
 }
 
